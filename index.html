@@ -8,46 +8,61 @@
 </head>
 <body>
 
-  <h1>🥗 Weekly Meal Planner</h1>
-  <p class="subtitle">Click 🎲 to randomize a meal, or 🚫 to permanently remove it from suggestions.</p>
+  <header class="site-header">
+    <div class="logo">Logo</div>
+    <!-- Hamburger toggle (mobile only) -->
+    <button class="hamburger" id="menuToggle" onclick="toggleSidebar()" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <h1>Weekly Meal Planner</h1>
+  <p class="subtitle">Get inspiration for your weekly meals.</p>
 
   <div class="top-bar">
-    <button class="btn-dark" onclick="randomizeAll()">🎲 Randomize Entire Week</button>
-    <button class="btn-outline" onclick="toggleAll(true)">Expand All</button>
-    <button class="btn-outline" onclick="toggleAll(false)">Collapse All</button>
+    <button class="btn-dark" onclick="randomizeAll()">🎲 Shuffle Week</button>
+    <button class="btn-outline" id="toggleAllBtn" onclick="toggleAllDays()">Collapse All</button>
   </div>
 
-  <div class="week" id="week"></div>
+  <!-- Backdrop for the slide-in panel -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
-  <!-- Banned meals -->
-  <div class="banned-section">
-    <h2>🚫 Banned Meals <span id="bannedCount"></span></h2>
-    <div id="bannedList"><p class="empty-note">No banned meals yet. Click 🚫 next to any meal to remove it from suggestions forever.</p></div>
-  </div>
+  <div class="layout">
+    <div class="week" id="week"></div>
 
-  <!-- Saved Weeks -->
-  <div class="saved-section">
-    <h2>💾 Saved Weeks</h2>
-    <div class="save-row">
-      <input type="text" id="weekNameInput" placeholder='"Pasta Week" or "Week A"' maxlength="40" />
-      <button class="btn-dark" onclick="saveWeek()">Save Current Week</button>
-    </div>
-    <div class="saved-list" id="savedList"></div>
-  </div>
+    <aside class="sidebar" id="sidebar">
+      
+      <!-- Custom Meals -->
+      <div class="custom-section">
+        <h2>➕ Add Your Own Meal Ideas</h2>
+        <div class="add-row">
+          <input type="text" id="customInput" placeholder="e.g. Grilled Chicken" maxlength="60" />
+          <select id="customCategory">
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+          </select>
+          <button class="btn-dark" onclick="addCustomMeal()">Save</button>
+        </div>
+        <div class="custom-lists" id="customLists"></div>
+      </div>
 
-  <!-- Custom Meals -->
-  <div class="custom-section">
-    <h2>➕ Add Your Own Meal Ideas</h2>
-    <div class="add-row">
-      <input type="text" id="customInput" placeholder="e.g. Shakshuka" maxlength="60" />
-      <select id="customCategory">
-        <option value="breakfast">Breakfast</option>
-        <option value="lunch">Lunch</option>
-        <option value="dinner">Dinner</option>
-      </select>
-      <button class="btn-dark" onclick="addCustomMeal()">Save</button>
-    </div>
-    <div class="custom-lists" id="customLists"></div>
+      <!-- Saved Weeks -->
+      <div class="saved-section">
+        <h2>💾 Saved Weeks</h2>
+        <div class="save-row">
+          <input type="text" id="weekNameInput" placeholder='"Pasta Week" or "Week A"' maxlength="40" />
+          <button class="btn-dark" onclick="saveWeek()">Save Current Week</button>
+        </div>
+        <div class="saved-list" id="savedList"></div>
+      </div>
+
+      <!-- Banned meals -->
+      <div class="banned-section">
+        <h2>🚫 Banned Meals <span id="bannedCount"></span></h2>
+        <div id="bannedList"><p class="empty-note">No banned meals yet. Click 🚫 next to any meal to remove it from suggestions forever.</p></div>
+      </div>
+    </aside>
   </div>
 
   <!-- Confirm Modal -->

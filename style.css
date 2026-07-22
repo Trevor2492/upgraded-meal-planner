@@ -16,7 +16,7 @@ body {
   font-family: system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
-  padding: 24px 16px;
+  padding: 40px 16px;
   min-height: 100vh;
 }
 
@@ -56,14 +56,90 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
 }
 .btn-outline:hover { opacity: .7; }
 
+/* ── Layout (main week + sidebar) ── */
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.sidebar {
+  flex-shrink: 0;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+/* ── Header ── */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1180px;
+  margin: 0 auto 24px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 40px;
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* ── Hamburger toggle + slide-in backdrop (mobile only) ── */
+.hamburger {
+  display: none;
+  position: relative;
+  z-index: 130;
+  width: 32px;
+  height: 32px;
+  padding: 8px;
+  background: #2c2c2c;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.hamburger span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform .25s, opacity .2s;
+}
+.hamburger.active span:nth-child(1) { transform: translateY(9.5px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: translateY(-9.5px) rotate(-45deg); }
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 110;
+  opacity: 0;
+  transition: opacity .3s;
+}
+.sidebar-backdrop.open { display: block; opacity: 1; }
+
 /* ── Week grid ── */
-.week { display: grid; gap: 10px; max-width: 780px; margin: 0 auto; }
+.week { display: grid; gap: 10px; flex: 1; min-width: 0; max-width: 780px; }
 
 .day-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  overflow: hidden;
 }
 .day-header {
   background: #2c2c2c;
@@ -77,13 +153,35 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   justify-content: space-between;
   cursor: pointer;
   user-select: none;
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
 }
+.day-card:not(.open) .day-header { border-radius: var(--radius); }
 .day-header:hover { background: #444; }
 .chevron { transition: transform .2s; font-style: normal; font-size: .8rem; }
 .day-card.open .chevron { transform: rotate(180deg); }
 
-.meals { padding: 10px 14px; display: grid; gap: 8px; }
-.day-card:not(.open) .meals { display: none; }
+.meals-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .3s ease;
+}
+.day-card.open .meals-wrap { grid-template-rows: 1fr; }
+.meals {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 14px;
+  display: grid;
+  gap: 8px;
+  transition: padding .3s ease;
+}
+/* pad only when open so the collapsed state animates to a true 0 height;
+   flip overflow to visible after the open finishes so the options menu isn't clipped */
+.day-card.open .meals {
+  padding: 10px 14px;
+  overflow: visible;
+  transition: padding .3s ease, overflow 0s .3s;
+}
 
 .meal-row { display: flex; align-items: baseline; gap: 10px; }
 .meal-label {
@@ -91,7 +189,7 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
-  width: 70px;
+  width: 95px;
   flex-shrink: 0;
   line-height: 1.4;
 }
@@ -99,9 +197,9 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
 .meal-label.l { color: var(--accent-l); }
 .meal-label.d { color: var(--accent-d); }
 .meal-text { flex: 1; font-size: .9rem; line-height: 1.4; }
-.meal-actions { display: flex; gap: 2px; flex-shrink: 0; }
+.meal-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
 .btn-roll,
-.btn-ban {
+.btn-menu {
   border: none;
   background: none;
   cursor: pointer;
@@ -113,8 +211,43 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   flex-shrink: 0;
 }
 .btn-roll:hover { transform: rotate(180deg); opacity: 1; transition: transform .2s, opacity .15s; }
-.btn-ban { font-size: .85rem; }
-.btn-ban:hover { opacity: 1; }
+.btn-menu { font-size: 1.2rem; line-height: 1; color: var(--text); }
+.btn-menu:hover { opacity: 1; }
+
+/* ── Meal row options menu ── */
+.meal-menu { position: relative; }
+.menu-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  min-width: 130px;
+  padding: 4px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgba(0,0,0,.14);
+  z-index: 60;
+}
+.meal-menu.open .menu-dropdown { display: block; }
+.menu-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  cursor: pointer;
+  font-size: .85rem;
+  text-align: left;
+  color: var(--text);
+}
+.menu-dropdown button:hover { background: var(--bg); }
+.menu-dropdown .menu-danger { color: #c0392b; }
+.menu-dropdown .menu-danger:hover { background: #fdecea; }
 
 /* ── Modal ── */
 .modal-overlay {
@@ -166,8 +299,7 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
 .banned-section,
 .saved-section,
 .custom-section {
-  max-width: 780px;
-  margin: 24px auto 0;
+  width: 100%;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -291,3 +423,40 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
 .btn-del:hover { opacity: .7; }
 
 .empty-note { font-size: .82rem; color: var(--muted); font-style: italic; }
+
+/* ── Responsive: sidebar slides in from the right via hamburger ── */
+@media (max-width: 960px) {
+  .hamburger { display: flex; }
+
+  .layout {
+    flex-direction: column;
+    max-width: 780px;
+  }
+  .week { max-width: none; width: 100%; }
+
+  .meal-label {
+    font-size: .6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    width: 65px;
+    flex-shrink: 0;
+    line-height: 1.4;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 115;
+    height: 100%;
+    width: min(360px, 85vw);
+    padding: 85px 16px 24px;
+    background: var(--bg);
+    box-shadow: -4px 0 24px rgba(0,0,0,.18);
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform .3s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+}

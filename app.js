@@ -74,28 +74,45 @@ function randomizeMeal(day, type) {
 }
 
 /* ── Accordion ── */
-function toggleDay(day) {
-  openState[day] = !openState[day];
-  renderWeek();
+// Toggle the class on the live element so the CSS transition can run
+// (re-rendering the whole week would recreate the node in its final state, skipping the animation).
+function applyOpenState(day) {
+  const card = document.querySelector(`.day-card[data-day="${day}"]`);
+  if (card) card.classList.toggle('open', openState[day]);
 }
 
-function toggleAll(state) {
-  DAYS.forEach(d => openState[d] = state);
-  renderWeek();
+function updateToggleAllLabel() {
+  const allOpen = DAYS.every(d => openState[d]);
+  document.getElementById('toggleAllBtn').textContent = allOpen ? 'Collapse All' : 'Expand All';
+}
+
+function toggleDay(day) {
+  openState[day] = !openState[day];
+  applyOpenState(day);
+  updateToggleAllLabel();
+}
+
+function toggleAllDays() {
+  const allOpen = DAYS.every(d => openState[d]);
+  DAYS.forEach(d => { openState[d] = !allOpen; applyOpenState(d); });
+  updateToggleAllLabel();
 }
 
 /* ── Render week ── */
 function renderWeek() {
+  updateToggleAllLabel();
   document.getElementById('week').innerHTML = DAYS.map(day => `
-    <div class="day-card ${openState[day] ? 'open' : ''}">
+    <div class="day-card ${openState[day] ? 'open' : ''}" data-day="${day}">
       <div class="day-header" onclick="toggleDay('${day}')">
         <span>${day}</span>
         <i class="chevron">▼</i>
       </div>
-      <div class="meals">
-        ${mealRow(day, 'breakfast', 'b', '🌅')}
-        ${mealRow(day, 'lunch',     'l', '☀️')}
-        ${mealRow(day, 'dinner',    'd', '🌙')}
+      <div class="meals-wrap">
+        <div class="meals">
+          ${mealRow(day, 'breakfast', 'b')}
+          ${mealRow(day, 'lunch',     'l')}
+          ${mealRow(day, 'dinner',    'd')}
+        </div>
       </div>
     </div>
   `).join('');
@@ -105,18 +122,45 @@ function esc(str) {
   return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
 
-function mealRow(day, type, cls, icon) {
+function mealRow(day, type, cls) {
   const meal = plan[day][type];
   const label = type.charAt(0).toUpperCase() + type.slice(1);
   return `
     <div class="meal-row">
-      <span class="meal-label ${cls}">${icon}&nbsp;${label}</span>
+      <span class="meal-label ${cls}">${label}</span>
       <span class="meal-text">${meal}</span>
       <div class="meal-actions">
         <button class="btn-roll" title="Randomize" onclick="randomizeMeal('${day}','${type}')">🎲</button>
-        <button class="btn-ban"  title="Ban this meal" onclick="promptBan('${esc(meal)}')">🚫</button>
+        <div class="meal-menu">
+          <button class="btn-menu" title="Options" aria-haspopup="true" onclick="toggleMealMenu(event, this)">⋮</button>
+          <div class="menu-dropdown">
+            <button onclick="editMeal('${day}','${type}')">✏️ Edit</button>
+            <button class="menu-danger" onclick="promptBan('${esc(meal)}')">🗑️ Delete</button>
+          </div>
+        </div>
       </div>
     </div>`;
+}
+
+/* ── Meal row menu ── */
+function toggleMealMenu(event, btn) {
+  event.stopPropagation();
+  const menu = btn.parentElement;
+  const isOpen = menu.classList.contains('open');
+  closeAllMealMenus();
+  if (!isOpen) menu.classList.add('open');
+}
+
+function closeAllMealMenus() {
+  document.querySelectorAll('.meal-menu.open').forEach(m => m.classList.remove('open'));
+}
+
+function editMeal(day, type) {
+  const next = prompt('Edit meal:', plan[day][type]);
+  if (next === null) return;
+  const val = next.trim();
+  if (val) plan[day][type] = val;
+  renderWeek();
 }
 
 /* ── Ban ── */
@@ -259,6 +303,24 @@ function renderCustomLists() {
     </div>`).join('');
 }
 
+/* ── Sidebar (mobile hamburger slide-in) ── */
+function setSidebar(open) {
+  document.getElementById('sidebar').classList.toggle('open', open);
+  document.getElementById('sidebarBackdrop').classList.toggle('open', open);
+  const btn = document.getElementById('menuToggle');
+  btn.classList.toggle('active', open);
+  btn.setAttribute('aria-expanded', String(open));
+  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+}
+
+function toggleSidebar() {
+  setSidebar(!document.getElementById('sidebar').classList.contains('open'));
+}
+
+function closeSidebar() {
+  setSidebar(false);
+}
+
 /* ── Init ── */
 DAYS.forEach(day => {
   plan[day] = { breakfast: pick('breakfast'), lunch: pick('lunch'), dinner: pick('dinner') };
@@ -267,6 +329,8 @@ DAYS.forEach(day => {
 document.getElementById('customInput').addEventListener('keydown', e => { if (e.key === 'Enter') addCustomMeal(); });
 document.getElementById('weekNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveWeek(); });
 document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.addEventListener('click', closeAllMealMenus);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllMealMenus(); });
 
 renderWeek();
 renderSaved();
