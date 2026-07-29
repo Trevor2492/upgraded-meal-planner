@@ -75,7 +75,6 @@ function randomizeMeal(day, type) {
 
 /* ── Accordion ── */
 // Toggle the class on the live element so the CSS transition can run
-// (re-rendering the whole week would recreate the node in its final state, skipping the animation).
 function applyOpenState(day) {
   const card = document.querySelector(`.day-card[data-day="${day}"]`);
   if (card) card.classList.toggle('open', openState[day]);
@@ -205,7 +204,7 @@ function renderBanned() {
   document.getElementById('bannedCount').textContent = banned.length ? `(${banned.length})` : '';
   const el = document.getElementById('bannedList');
   if (!banned.length) {
-    el.innerHTML = '<p class="empty-note">No banned meals yet. Click 🚫 next to any meal to remove it from suggestions forever.</p>';
+    el.innerHTML = '<p class="empty-note">No banned meals yet. Click "Delete" next to any meal to remove it from suggestions forever.</p>';
     return;
   }
   el.innerHTML = `<div class="banned-grid">${
@@ -331,6 +330,8 @@ document.getElementById('weekNameInput').addEventListener('keydown', e => { if (
 document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 document.addEventListener('click', closeAllMealMenus);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllMealMenus(); });
+
+document.getElementById('year').textContent = new Date().getFullYear();
 
 renderWeek();
 renderSaved();
