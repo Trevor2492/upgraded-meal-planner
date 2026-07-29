@@ -1,24 +1,36 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+@font-face {
+  font-family: 'Alice';
+  src: url('fonts/Alice-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #f7f5f2;
   --card: #ffffff;
   --border: #e2ddd8;
-  --accent-b: #4a90d9;
-  --accent-l: #5cb85c;
-  --accent-d: #e07b39;
+  --accent-b: #b8820e;   /* breakfast — logo golden lemon */
+  --accent-l: #5f9e47;   /* lunch — logo leaf green */
+  --accent-d: #d0641f;   /* dinner — logo salmon orange */
+  --slate: #5a7070;      /* logo wordmark / plate rim */
+  --slate-dark: #4c6060; /* hover */
   --text: #2c2c2c;
   --muted: #888;
   --radius: 8px;
 }
 
 body {
-  font-family: system-ui, sans-serif;
+  font-family: 'Alice', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   padding: 40px 16px;
   min-height: 100vh;
 }
+
+button, input, select, textarea { font-family: inherit; }
 
 h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
 .subtitle { text-align: center; color: var(--muted); font-size: .85rem; margin-bottom: 24px; }
@@ -32,7 +44,7 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   flex-wrap: wrap;
 }
 .btn-dark {
-  background: #2c2c2c;
+  background: var(--slate);
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -43,10 +55,11 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   transition: opacity .15s;
 }
 .btn-dark:hover { opacity: .8; }
+.btn-slate { background: var(--slate); }
 .btn-outline {
   background: #fff;
-  color: #2c2c2c;
-  border: 2px solid #2c2c2c;
+  color: var(--slate);
+  border: 2px solid var(--slate);
   padding: 8px 18px;
   border-radius: var(--radius);
   cursor: pointer;
@@ -80,19 +93,10 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   margin: 0 auto 24px;
 }
 .logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 96px;
-  height: 40px;
-  background: var(--card);
-  border: 1px dashed var(--border);
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
   border-radius: var(--radius);
-  color: var(--muted);
-  font-size: .8rem;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
 }
 
 /* ── Hamburger toggle + slide-in backdrop (mobile only) ── */
@@ -103,7 +107,7 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   width: 32px;
   height: 32px;
   padding: 8px;
-  background: #2c2c2c;
+  background: var(--slate);
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
@@ -118,9 +122,9 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   border-radius: 2px;
   transition: transform .25s, opacity .2s;
 }
-.hamburger.active span:nth-child(1) { transform: translateY(9.5px) rotate(45deg); }
+.hamburger.active span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
 .hamburger.active span:nth-child(2) { opacity: 0; }
-.hamburger.active span:nth-child(3) { transform: translateY(-9.5px) rotate(-45deg); }
+.hamburger.active span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
 
 .sidebar-backdrop {
   display: none;
@@ -142,7 +146,7 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   border-radius: var(--radius);
 }
 .day-header {
-  background: #2c2c2c;
+  background: var(--slate);
   color: #fff;
   padding: 10px 14px;
   font-weight: 700;
@@ -157,7 +161,7 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   border-top-right-radius: var(--radius);
 }
 .day-card:not(.open) .day-header { border-radius: var(--radius); }
-.day-header:hover { background: #444; }
+.day-header:hover { background: var(--slate-dark); }
 .chevron { transition: transform .2s; font-style: normal; font-size: .8rem; }
 .day-card.open .chevron { transform: rotate(180deg); }
 
@@ -346,7 +350,7 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   border-radius: var(--radius);
   outline: none;
 }
-.save-row input:focus { border-color: #aaa; }
+.save-row input:focus { border-color: var(--slate); }
 .saved-list { margin-top: 14px; display: grid; gap: 8px; }
 .saved-item {
   display: flex;
@@ -367,8 +371,8 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   font-size: .8rem;
   font-weight: 600;
 }
-.btn-load { background: #e8f0fe; color: #2c5fc7; }
-.btn-load:hover { background: #d0e1fd; }
+.btn-load { background: #e6eded; color: var(--slate-dark); }
+.btn-load:hover { background: #d6e0e0; }
 .btn-del-week { background: #fdecea; color: #c0392b; }
 .btn-del-week:hover { background: #f9d0cd; }
 
@@ -383,7 +387,7 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   border-radius: var(--radius);
   outline: none;
 }
-.add-row input:focus { border-color: #aaa; }
+.add-row input:focus { border-color: var(--slate); }
 .add-row select {
   padding: 8px 10px;
   font-size: .9rem;
@@ -424,6 +428,24 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
 
 .empty-note { font-size: .82rem; color: var(--muted); font-style: italic; }
 
+/* ── Footer ── */
+.site-footer {
+  max-width: 1180px;
+  margin: 48px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: .85rem;
+  color: var(--muted);
+}
+.site-footer .copyright { margin-bottom: 10px; }
+.site-footer a {
+  display: inline-flex;
+  color: var(--slate);
+  transition: color .15s, transform .15s;
+}
+.site-footer a:hover { color: var(--slate-dark); transform: translateY(-2px); }
+
 /* ── Responsive: sidebar slides in from the right via hamburger ── */
 @media (max-width: 960px) {
   .hamburger { display: flex; }
@@ -434,6 +456,11 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
   }
   .week { max-width: none; width: 100%; }
 
+  .meal-row {
+    height: 2.5rem;
+    align-items: center;
+  }
+
   .meal-label {
     font-size: .6rem;
     font-weight: 700;
@@ -443,6 +470,12 @@ h1 { text-align: center; font-size: 1.6rem; margin-bottom: 4px; }
     flex-shrink: 0;
     line-height: 1.4;
   }
+
+  .btn-roll, .btn-menu {
+    font-size: 1.5rem;
+  }
+
+  .meal-actions { gap: 4px; }
 
   .sidebar {
     position: fixed;
